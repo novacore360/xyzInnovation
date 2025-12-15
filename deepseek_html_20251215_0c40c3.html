@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XYZ INNOVAGENCE | Presale</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@solana/web3.js@1.70.0/lib/index.iife.min.js"></script>
+    <script src="https://unpkg.com/@solana/wallet-adapter-base@0.9.23/lib/index.iife.js"></script>
+    <script src="https://unpkg.com/@solana/wallet-adapter-phantom@0.9.15/lib/index.iife.js"></script>
+    <script src="https://unpkg.com/@solana/wallet-adapter-solflare@0.6.12/lib/index.iife.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <style>
+        :root {
+            /* Neumorphic colors - Neon Grey & Black Theme */
+            --neumorphic-bg: #0a0a0a;
+            --neumorphic-shadow-light: rgba(255, 255, 255, 0.1);
+            --neumorphic-shadow-dark: rgba(0, 0, 0, 0.8);
+            --neumorphic-inset-light: rgba(255, 255, 255, 0.05);
+            --neumorphic-inset-dark: rgba(0, 0, 0, 0.5);
+            --neumorphic-active-bg: #1a1a1a;
+            
+            /* Accent colors */
+            --neon-cyan: #00f3ff;
+            --neon-purple: #9d00ff;
+            --neon-pink: #ff00cc;
+            --text-primary: #f0f0f0;
+            --text-secondary: #aaaaaa;
+            --success: #00ff9d;
+            --warning: #ffcc00;
+            --error: #ff3d3d;
+            
+            /* Layout */
+            --border-radius: 20px;
+            --spacing-xs: 8px;
+            --spacing-sm: 16px;
+            --spacing-md: 24px;
+            --spacing-lg: 32px;
+            --spacing-xl: 48px;
+            
+            /* Shadows */
+            --neumorphic-shadow: 8px 8px 16px var(--neumorphic-shadow-dark),
+                                 -8px -8px 16px var(--neumorphic-shadow-light);
+            --neumorphic-inset: inset 4px 4px 8px var(--neumorphic-inset-dark),
+                                inset -4px -4px 8px var(--neumorphic-inset-light);
+            --neumorphic-active: inset 2px 2px 4px var(--neumorphic-inset-dark),
+                                 inset -2px -2px 4px var(--neumorphic-inset-light);
+            --neumorphic-active-light: inset 2px 2px 4px var(--neumorphic-inset-light),
+                                       inset -2px -2px 4px var(--neumorphic-inset-dark);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--neumorphic-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(157, 0, 255, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 243, 255, 0.05) 0%, transparent 20%);
+        }
+
+        /* Neon glowing effects */
+        .neon-border {
+            position: relative;
+            border-radius: var(--border-radius);
+        }
+
+        .neon-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink), var(--neon-cyan));
+            border-radius: calc(var(--border-radius) + 2px);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .neon-border:hover::before {
+            opacity: 0.7;
+        }
+
+        .neon-glow {
+            text-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan), 0 0 15px var(--neon-cyan);
+        }
+
+        .neon-text {
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Container styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            border-radius: var(--border-radius);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-shadow);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--neon-cyan);
+            filter: drop-shadow(0 0 8px var(--neon-cyan));
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* Connect wallet button */
+        #connectWallet {
+            background: var(--neumorphic-bg);
+            border: none;
+            color: var(--text-primary);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            box-shadow: var(--neumorphic-shadow);
+            transition: all 0.3s ease;
+        }
+
+        #connectWallet:hover {
+            box-shadow: var(--neumorphic-active);
+            transform: translateY(-2px);
+            color: var(--neon-cyan);
+        }
+
+        #connectWallet.connected {
+            background: var(--neumorphic-active-bg);
+            color: var(--success);
+        }
+
+        #connectWallet i {
+            font-size: 1.2rem;
+        }
+
+        /* Main content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dashboard panel */
+        .dashboard-panel, .purchase-panel {
+            border-radius: var(--border-radius);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-shadow);
+            padding: var(--spacing-lg);
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-panel:hover, .purchase-panel:hover {
+            box-shadow: 10px 10px 20px var(--neumorphic-shadow-dark),
+                        -10px -10px 20px var(--neumorphic-shadow-light);
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+
+        .panel-title i {
+            color: var(--neon-cyan);
+        }
+
+        /* Balance cards */
+        .balance-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .balance-card {
+            border-radius: var(--border-radius);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-inset);
+            padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .balance-card:hover {
+            box-shadow: var(--neumorphic-active-light);
+            transform: translateY(-3px);
+        }
+
+        .balance-icon {
+            font-size: 2rem;
+            margin-bottom: var(--spacing-sm);
+            color: var(--neon-purple);
+        }
+
+        .balance-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .balance-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .balance-usd {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Purchase options */
+        .purchase-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .purchase-option {
+            border-radius: var(--border-radius);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-shadow);
+            padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .purchase-option:hover {
+            box-shadow: var(--neumorphic-active);
+            border-color: var(--neon-cyan);
+            transform: translateY(-5px);
+        }
+
+        .purchase-option.selected {
+            background: var(--neumorphic-active-bg);
+            box-shadow: var(--neumorphic-active);
+            border-color: var(--neon-purple);
+        }
+
+        .purchase-sol {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .purchase-xyz {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--neon-cyan);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .purchase-bonus {
+            font-size: 0.8rem;
+            color: var(--success);
+            background: rgba(0, 255, 157, 0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* Custom amount */
+        .custom-amount {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .custom-input-group {
+            display: flex;
+            align-items: center;
+            background: var(--neumorphic-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--neumorphic-inset);
+            padding: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .custom-input-group input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            padding: var(--spacing-sm);
+            outline: none;
+        }
+
+        .currency-label {
+            color: var(--neon-cyan);
+            font-weight: 600;
+            margin-right: var(--spacing-sm);
+            min-width: 40px;
+        }
+
+        .conversion-result {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            padding: var(--spacing-sm);
+        }
+
+        .conversion-result span {
+            color: var(--neon-cyan);
+            font-weight: 600;
+        }
+
+        /* Confirm button */
+        #confirmPurchase {
+            width: 100%;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
+            border: none;
+            color: #000;
+            padding: var(--spacing-md);
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+            box-shadow: 0 5px 15px rgba(0, 243, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        #confirmPurchase:hover:not(:disabled) {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.4);
+        }
+
+        #confirmPurchase:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Transaction history */
+        .transaction-history {
+            border-radius: var(--border-radius);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-shadow);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .history-title {
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+
+        .history-title i {
+            color: var(--neon-pink);
+        }
+
+        #transactionList {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+            border-radius: var(--border-radius);
+            background: var(--neumorphic-active-bg);
+            box-shadow: var(--neumorphic-inset);
+            transition: all 0.2s ease;
+        }
+
+        .transaction-item:hover {
+            box-shadow: var(--neumorphic-active-light);
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            color: var(--neon-cyan);
+        }
+
+        .transaction-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .transaction-status {
+            font-size: 0.8rem;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: rgba(255, 204, 0, 0.1);
+            color: var(--warning);
+        }
+
+        .status-failed {
+            background: rgba(255, 61, 61, 0.1);
+            color: var(--error);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: var(--spacing-lg);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        footer a {
+            color: var(--neon-cyan);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--neumorphic-bg);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-xl);
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--neumorphic-shadow);
+            border: 1px solid var(--neumorphic-inset-light);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--neon-cyan);
+        }
+
+        .wallet-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .wallet-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .wallet-option:hover {
+            box-shadow: var(--neumorphic-active);
+            transform: translateY(-5px);
+        }
+
+        .wallet-option i {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-sm);
+            color: var(--neon-purple);
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid var(--neumorphic-shadow-dark);
+            border-top: 3px solid var(--neon-cyan);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .balance-container, .purchase-options, .wallet-options {
+                grid-template-columns: 1fr;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: var(--spacing-md);
+            }
+            
+            .logo-text {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="neon-border">
+            <div class="logo">
+                <i class="fas fa-cube logo-icon"></i>
+                <div class="logo-text neon-text">XYZ INNOVAGENCE</div>
+            </div>
+            <button id="connectWallet" class="neon-border">
+                <i class="fas fa-wallet"></i>
+                <span>Connect Wallet</span>
+            </button>
+        </header>
+
+        <div class="main-content">
+            <div class="dashboard-panel neon-border">
+                <h2 class="panel-title"><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                <div id="userInfo" style="display: none;">
+                    <div class="balance-container">
+                        <div class="balance-card">
+                            <i class="fas fa-wallet balance-icon"></i>
+                            <div class="balance-label">SOL Balance</div>
+                            <div id="solBalance" class="balance-amount">0.00</div>
+                            <div id="solUsd" class="balance-usd">$0.00</div>
+                        </div>
+                        <div class="balance-card">
+                            <i class="fas fa-coins balance-icon"></i>
+                            <div class="balance-label">XYZ Tokens</div>
+                            <div id="xyzBalance" class="balance-amount">0</div>
+                            <div class="balance-usd">Presale Tokens</div>
+                        </div>
+                    </div>
+                    <div class="wallet-address">
+                        <div class="balance-label">Connected Wallet</div>
+                        <div id="walletAddress" class="balance-amount" style="font-size: 1.2rem; word-break: break-all;"></div>
+                    </div>
+                </div>
+                <div id="loginPrompt" style="text-align: center; padding: var(--spacing-xl);">
+                    <i class="fas fa-wallet" style="font-size: 4rem; color: var(--text-secondary); margin-bottom: var(--spacing-md);"></i>
+                    <h3 style="margin-bottom: var(--spacing-sm); color: var(--text-primary);">Connect Your Wallet</h3>
+                    <p style="color: var(--text-secondary);">Connect your Solana wallet to participate in the XYZ INNOVAGENCE presale</p>
+                </div>
+            </div>
+
+            <div class="purchase-panel neon-border">
+                <h2 class="panel-title"><i class="fas fa-shopping-cart"></i> Purchase XYZ Tokens</h2>
+                <div class="purchase-options">
+                    <div class="purchase-option" data-sol="1" data-xyz="112">
+                        <div class="purchase-sol">1 SOL</div>
+                        <div class="purchase-xyz">112 XYZ</div>
+                        <div class="purchase-bonus">+5% Bonus</div>
+                    </div>
+                    <div class="purchase-option" data-sol="5" data-xyz="563">
+                        <div class="purchase-sol">5 SOL</div>
+                        <div class="purchase-xyz">563 XYZ</div>
+                        <div class="purchase-bonus">+10% Bonus</div>
+                    </div>
+                    <div class="purchase-option" data-sol="10" data-xyz="1126">
+                        <div class="purchase-sol">10 SOL</div>
+                        <div class="purchase-xyz">1,126 XYZ</div>
+                        <div class="purchase-bonus">+15% Bonus</div>
+                    </div>
+                </div>
+
+                <div class="custom-amount">
+                    <h3 style="margin-bottom: var(--spacing-sm); color: var(--text-primary);">Custom Amount</h3>
+                    <div class="custom-input-group">
+                        <div class="currency-label">SOL</div>
+                        <input type="number" id="customSol" placeholder="Enter SOL amount" min="0.1" step="0.1">
+                    </div>
+                    <div class="conversion-result">
+                        <span id="customXyz">0</span> XYZ Tokens
+                        <div style="font-size: 0.9rem; margin-top: 5px;">Rate: 1 SOL = 112 XYZ ($0.00888 per XYZ)</div>
+                    </div>
+                </div>
+
+                <button id="confirmPurchase" disabled>
+                    <i class="fas fa-check-circle"></i>
+                    <span>Confirm Purchase</span>
+                </button>
+                
+                <div style="margin-top: var(--spacing-md); text-align: center; color: var(--text-secondary); font-size: 0.9rem;">
+                    <p>Funds will be sent to: <span style="color: var(--neon-cyan);">ARN3gpCaGvySyE6hnK3KsNco6VCNZbBNLqMosPgjrvjy</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="transaction-history neon-border">
+            <h2 class="history-title"><i class="fas fa-history"></i> Transaction History</h2>
+            <div id="transactionList">
+                <div style="text-align: center; padding: var(--spacing-lg); color: var(--text-secondary);">
+                    <i class="fas fa-exchange-alt" style="font-size: 3rem; margin-bottom: var(--spacing-sm);"></i>
+                    <p>No transactions yet. Connect your wallet and make a purchase to see your history.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>XYZ INNOVAGENCE Presale Platform. Powered by Solana & Firebase.</p>
+            <p>Use at your own risk. Always verify transaction details before confirming.</p>
+            <p>Helius RPC &copy; 2023 XYZ INNOVAGENCE</p>
+        </footer>
+    </div>
+
+    <!-- Wallet Connection Modal -->
+    <div id="walletModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Select Wallet</h2>
+            <div class="wallet-options">
+                <div class="wallet-option" id="phantomWallet">
+                    <i class="fas fa-ghost"></i>
+                    <span>Phantom</span>
+                </div>
+                <div class="wallet-option" id="solflareWallet">
+                    <i class="fas fa-fire"></i>
+                    <span>Solflare</span>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <button id="closeModal" style="background: none; border: none; color: var(--text-secondary); cursor: pointer;">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div id="loadingModal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <div class="spinner"></div>
+            <h2 class="modal-title" style="margin-top: var(--spacing-md);">Processing Transaction</h2>
+            <p style="color: var(--text-secondary); margin-top: var(--spacing-sm);" id="loadingMessage">Please wait while we process your purchase...</p>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfmTStSffKTDb8pPQrgBbNADK8jQq6s38",
+            authDomain: "arbify-ce847.firebaseapp.com",
+            databaseURL: "https://arbify-ce847-default-rtdb.firebaseio.com",
+            projectId: "arbify-ce847",
+            storageBucket: "arbify-ce847.firebasestorage.app",
+            messagingSenderId: "917500508857",
+            appId: "1:917500508857:web:290a8b2de00934b8cfb968",
+            measurementId: "G-8M416W4MY2"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Solana Configuration
+        const solanaWeb3 = window.solanaWeb3;
+        const walletAdapter = window.solanaWalletAdapter;
+        const HELIUS_RPC = 'https://mainnet.helius-rpc.com/?api-key=944a3332-20cf-47be-9390-6ca28d0e3999';
+        const connection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
+        
+        // Presale wallet address
+        const PRESALE_WALLET = new solanaWeb3.PublicKey('ARN3gpCaGvySyE6hnK3KsNco6VCNZbBNLqMosPgjrvjy');
+        
+        // App State
+        let wallet = null;
+        let userPublicKey = null;
+        let selectedPurchaseOption = null;
+        let solPriceUsd = 100; // Default SOL price in USD
+        let userData = null;
+
+        // DOM Elements
+        const connectWalletBtn = document.getElementById('connectWallet');
+        const walletModal = document.getElementById('walletModal');
+        const phantomWalletBtn = document.getElementById('phantomWallet');
+        const solflareWalletBtn = document.getElementById('solflareWallet');
+        const closeModalBtn = document.getElementById('closeModal');
+        const loadingModal = document.getElementById('loadingModal');
+        const confirmPurchaseBtn = document.getElementById('confirmPurchase');
+        const customSolInput = document.getElementById('customSol');
+        const customXyzDisplay = document.getElementById('customXyz');
+        const solBalanceDisplay = document.getElementById('solBalance');
+        const solUsdDisplay = document.getElementById('solUsd');
+        const xyzBalanceDisplay = document.getElementById('xyzBalance');
+        const walletAddressDisplay = document.getElementById('walletAddress');
+        const userInfoDiv = document.getElementById('userInfo');
+        const loginPromptDiv = document.getElementById('loginPrompt');
+        const transactionList = document.getElementById('transactionList');
+        const purchaseOptions = document.querySelectorAll('.purchase-option');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            setupEventListeners();
+            checkSavedWallet();
+            fetchSolPrice();
+            
+            // Initialize purchase option selection
+            purchaseOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    purchaseOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    selectedPurchaseOption = {
+                        sol: parseFloat(option.dataset.sol),
+                        xyz: parseInt(option.dataset.xyz)
+                    };
+                    updateConfirmButton();
+                });
+            });
+        });
+
+        // Event Listeners
+        function setupEventListeners() {
+            connectWalletBtn.addEventListener('click', () => {
+                walletModal.style.display = 'flex';
+            });
+
+            phantomWalletBtn.addEventListener('click', () => connectWallet('phantom'));
+            solflareWalletBtn.addEventListener('click', () => connectWallet('solflare'));
+            
+            closeModalBtn.addEventListener('click', () => {
+                walletModal.style.display = 'none';
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', (event) => {
+                if (event.target === walletModal) {
+                    walletModal.style.display = 'none';
+                }
+                if (event.target === loadingModal) {
+                    // Don't close loading modal by clicking outside
+                }
+            });
+
+            // Custom amount input
+            customSolInput.addEventListener('input', () => {
+                const solAmount = parseFloat(customSolInput.value) || 0;
+                const xyzAmount = Math.floor(solAmount / 0.00888);
+                customXyzDisplay.textContent = xyzAmount.toLocaleString();
+                
+                // Deselect preset options when typing custom amount
+                purchaseOptions.forEach(opt => opt.classList.remove('selected'));
+                selectedPurchaseOption = null;
+                
+                updateConfirmButton();
+            });
+
+            // Confirm purchase
+            confirmPurchaseBtn.addEventListener('click', async () => {
+                if (!userPublicKey || (!selectedPurchaseOption && !customSolInput.value)) {
+                    showNotification('Please select a purchase option or enter a custom amount', 'error');
+                    return;
+                }
+
+                let solAmount, xyzAmount;
+                
+                if (selectedPurchaseOption) {
+                    solAmount = selectedPurchaseOption.sol;
+                    xyzAmount = selectedPurchaseOption.xyz;
+                } else {
+                    solAmount = parseFloat(customSolInput.value);
+                    xyzAmount = Math.floor(solAmount / 0.00888);
+                }
+
+                if (solAmount <= 0) {
+                    showNotification('Please enter a valid SOL amount', 'error');
+                    return;
+                }
+
+                await processPurchase(solAmount, xyzAmount);
+            });
+        }
+
+        // Check for saved wallet connection
+        function checkSavedWallet() {
+            const savedWallet = localStorage.getItem('xyz_connected_wallet');
+            if (savedWallet) {
+                userPublicKey = new solanaWeb3.PublicKey(savedWallet);
+                updateUIAfterConnection();
+            }
+        }
+
+        // Connect wallet
+        async function connectWallet(walletType) {
+            try {
+                showLoading('Connecting wallet...');
+                
+                if (walletType === 'phantom') {
+                    if (!window.solana || !window.solana.isPhantom) {
+                        showNotification('Phantom wallet not found. Please install it first.', 'error');
+                        hideLoading();
+                        return;
+                    }
+                    wallet = window.solana;
+                } else if (walletType === 'solflare') {
+                    if (!window.solflare) {
+                        showNotification('Solflare wallet not found. Please install it first.', 'error');
+                        hideLoading();
+                        return;
+                    }
+                    wallet = window.solflare;
+                }
+
+                // Request connection
+                const response = await wallet.connect();
+                userPublicKey = new solanaWeb3.PublicKey(response.publicKey.toString());
+                
+                // Save to localStorage
+                localStorage.setItem('xyz_connected_wallet', userPublicKey.toString());
+                
+                // Update UI
+                updateUIAfterConnection();
+                
+                // Close modal
+                walletModal.style.display = 'none';
+                
+                showNotification('Wallet connected successfully!', 'success');
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                showNotification('Failed to connect wallet: ' + error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Update UI after wallet connection
+        async function updateUIAfterConnection() {
+            if (!userPublicKey) return;
+
+            // Show user info, hide login prompt
+            userInfoDiv.style.display = 'block';
+            loginPromptDiv.style.display = 'none';
+            
+            // Update wallet address display
+            walletAddressDisplay.textContent = userPublicKey.toString();
+            
+            // Update connect button
+            connectWalletBtn.innerHTML = '<i class="fas fa-check-circle"></i><span>Connected</span>';
+            connectWalletBtn.classList.add('connected');
+            
+            // Fetch balances
+            await fetchBalances();
+            
+            // Load transaction history
+            loadTransactionHistory();
+            
+            // Create/update user in Firebase
+            await createOrUpdateUser();
+        }
+
+        // Fetch SOL and XYZ balances
+        async function fetchBalances() {
+            if (!userPublicKey) return;
+
+            try {
+                // Fetch SOL balance
+                const solBalance = await connection.getBalance(userPublicKey);
+                const solInSol = solBalance / 1e9;
+                solBalanceDisplay.textContent = solInSol.toFixed(4);
+                solUsdDisplay.textContent = `$${(solInSol * solPriceUsd).toFixed(2)}`;
+
+                // Fetch XYZ balance from Firebase
+                const userDoc = await db.collection('users').doc(userPublicKey.toString()).get();
+                if (userDoc.exists) {
+                    userData = userDoc.data();
+                    const xyzBalance = userData.xyzBalance || 0;
+                    xyzBalanceDisplay.textContent = xyzBalance.toLocaleString();
+                } else {
+                    xyzBalanceDisplay.textContent = '0';
+                }
+            } catch (error) {
+                console.error('Error fetching balances:', error);
+            }
+        }
+
+        // Fetch SOL price in USD
+        async function fetchSolPrice() {
+            try {
+                // In a real app, you would fetch from an API
+                // For demo purposes, we'll use a mock price
+                solPriceUsd = 100; // Mock price
+            } catch (error) {
+                console.error('Error fetching SOL price:', error);
+            }
+        }
+
+        // Create or update user in Firebase
+        async function createOrUpdateUser() {
+            if (!userPublicKey) return;
+
+            try {
+                const userRef = db.collection('users').doc(userPublicKey.toString());
+                const userDoc = await userRef.get();
+                
+                if (userDoc.exists) {
+                    // Update last login
+                    await userRef.update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    userData = userDoc.data();
+                } else {
+                    // Create new user
+                    const newUser = {
+                        walletAddress: userPublicKey.toString(),
+                        xyzBalance: 0,
+                        totalContributed: 0,
+                        transactions: [],
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    await userRef.set(newUser);
+                    userData = newUser;
+                }
+            } catch (error) {
+                console.error('Error creating/updating user:', error);
+            }
+        }
+
+        // Process purchase
+        async function processPurchase(solAmount, xyzAmount) {
+            if (!userPublicKey || !wallet) {
+                showNotification('Please connect your wallet first', 'error');
+                return;
+            }
+
+            try {
+                showLoading('Preparing transaction...');
+                
+                // Create transaction
+                const transaction = new solanaWeb3.Transaction().add(
+                    solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: userPublicKey,
+                        toPubkey: PRESALE_WALLET,
+                        lamports: solAmount * 1e9
+                    })
+                );
+
+                // Set recent blockhash
+                const { blockhash } = await connection.getRecentBlockhash();
+                transaction.recentBlockhash = blockhash;
+                transaction.feePayer = userPublicKey;
+
+                // Sign transaction
+                showLoading('Please approve the transaction in your wallet...');
+                const signed = await wallet.signTransaction(transaction);
+                
+                // Send transaction
+                showLoading('Sending transaction to the network...');
+                const signature = await connection.sendRawTransaction(signed.serialize());
+                
+                // Confirm transaction
+                showLoading('Confirming transaction...');
+                const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+                
+                if (confirmation.value.err) {
+                    throw new Error('Transaction failed');
+                }
+
+                // Save to Firebase
+                await saveTransactionToFirebase(solAmount, xyzAmount, signature);
+                
+                // Update local balance
+                userData.xyzBalance = (userData.xyzBalance || 0) + xyzAmount;
+                xyzBalanceDisplay.textContent = userData.xyzBalance.toLocaleString();
+                
+                // Add to transaction history
+                addTransactionToHistory(solAmount, xyzAmount, signature, 'completed');
+                
+                // Reset form
+                purchaseOptions.forEach(opt => opt.classList.remove('selected'));
+                customSolInput.value = '';
+                selectedPurchaseOption = null;
+                updateConfirmButton();
+                
+                showNotification(`Successfully purchased ${xyzAmount.toLocaleString()} XYZ tokens!`, 'success');
+            } catch (error) {
+                console.error('Purchase error:', error);
+                showNotification('Purchase failed: ' + error.message, 'error');
+                
+                // Add failed transaction to history
+                addTransactionToHistory(solAmount, xyzAmount, 'failed', 'failed');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Save transaction to Firebase
+        async function saveTransactionToFirebase(solAmount, xyzAmount, signature) {
+            if (!userPublicKey) return;
+
+            try {
+                const userRef = db.collection('users').doc(userPublicKey.toString());
+                const transactionData = {
+                    solAmount,
+                    xyzAmount,
+                    signature,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'completed'
+                };
+
+                // Update user document
+                await userRef.update({
+                    xyzBalance: firebase.firestore.FieldValue.increment(xyzAmount),
+                    totalContributed: firebase.firestore.FieldValue.increment(solAmount),
+                    transactions: firebase.firestore.FieldValue.arrayUnion(transactionData)
+                });
+
+                // Also save to transactions collection
+                await db.collection('transactions').add({
+                    ...transactionData,
+                    walletAddress: userPublicKey.toString()
+                });
+            } catch (error) {
+                console.error('Error saving transaction to Firebase:', error);
+            }
+        }
+
+        // Load transaction history
+        async function loadTransactionHistory() {
+            if (!userPublicKey) return;
+
+            try {
+                const transactionsRef = db.collection('transactions')
+                    .where('walletAddress', '==', userPublicKey.toString())
+                    .orderBy('timestamp', 'desc')
+                    .limit(10);
+
+                const snapshot = await transactionsRef.get();
+                
+                if (snapshot.empty) {
+                    return;
+                }
+
+                transactionList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const transaction = doc.data();
+                    addTransactionToHistory(
+                        transaction.solAmount,
+                        transaction.xyzAmount,
+                        transaction.signature,
+                        transaction.status
+                    );
+                });
+            } catch (error) {
+                console.error('Error loading transaction history:', error);
+            }
+        }
+
+        // Add transaction to history UI
+        function addTransactionToHistory(solAmount, xyzAmount, signature, status) {
+            const transactionItem = document.createElement('div');
+            transactionItem.className = 'transaction-item';
+            
+            const date = new Date().toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            let statusClass = 'status-pending';
+            let statusText = 'Pending';
+            
+            if (status === 'completed') {
+                statusClass = 'status-completed';
+                statusText = 'Completed';
+            } else if (status === 'failed') {
+                statusClass = 'status-failed';
+                statusText = 'Failed';
+            }
+            
+            transactionItem.innerHTML = `
+                <div>
+                    <div class="transaction-amount">${solAmount} SOL → ${xyzAmount.toLocaleString()} XYZ</div>
+                    <div class="transaction-date">${date}</div>
+                </div>
+                <div class="transaction-status ${statusClass}">${statusText}</div>
+            `;
+            
+            // Add at the beginning
+            if (transactionList.children.length > 0 && 
+                !transactionList.children[0].classList.contains('transaction-item')) {
+                transactionList.innerHTML = '';
+            }
+            
+            transactionList.prepend(transactionItem);
+        }
+
+        // Update confirm button state
+        function updateConfirmButton() {
+            const hasSelection = selectedPurchaseOption || (customSolInput.value && parseFloat(customSolInput.value) > 0);
+            confirmPurchaseBtn.disabled = !hasSelection;
+        }
+
+        // Show loading modal
+        function showLoading(message) {
+            document.getElementById('loadingMessage').textContent = message;
+            loadingModal.style.display = 'flex';
+        }
+
+        // Hide loading modal
+        function hideLoading() {
+            loadingModal.style.display = 'none';
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            // Style the notification
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'rgba(0, 255, 157, 0.1)' : 'rgba(255, 61, 61, 0.1)'};
+                color: ${type === 'success' ? 'var(--success)' : 'var(--error)'};
+                padding: var(--spacing-sm) var(--spacing-md);
+                border-radius: var(--border-radius);
+                display: flex;
+                align-items: center;
+                gap: var(--spacing-sm);
+                box-shadow: var(--neumorphic-shadow);
+                border: 1px solid ${type === 'success' ? 'var(--success)' : 'var(--error)'};
+                z-index: 10000;
+                max-width: 400px;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            // Add to body
+            document.body.appendChild(notification);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // Add keyframe animations for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
