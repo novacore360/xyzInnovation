@@ -1,0 +1,2215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XYZ INNOVAGENCE | Advanced Presale Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@solana/web3.js@1.70.0/lib/index.iife.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://unpkg.com/particles.js@2.0.0/particles.js"></script>
+    <style>
+        :root {
+            /* Neumorphic colors - Enhanced Neon Theme */
+            --neumorphic-bg: #0a0a0a;
+            --neumorphic-bg-light: #1a1a1a;
+            --neumorphic-shadow-light: rgba(255, 255, 255, 0.08);
+            --neumorphic-shadow-dark: rgba(0, 0, 0, 0.9);
+            --neumorphic-inset-light: rgba(255, 255, 255, 0.03);
+            --neumorphic-inset-dark: rgba(0, 0, 0, 0.6);
+            --neumorphic-active-bg: #222222;
+            
+            /* Enhanced Neon Colors */
+            --neon-cyan: #00f3ff;
+            --neon-cyan-glow: rgba(0, 243, 255, 0.4);
+            --neon-purple: #9d00ff;
+            --neon-purple-glow: rgba(157, 0, 255, 0.4);
+            --neon-pink: #ff00cc;
+            --neon-pink-glow: rgba(255, 0, 204, 0.4);
+            --neon-green: #00ff9d;
+            --neon-green-glow: rgba(0, 255, 157, 0.4);
+            --neon-yellow: #ffcc00;
+            --neon-yellow-glow: rgba(255, 204, 0, 0.4);
+            
+            /* Text Colors */
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-tertiary: #808080;
+            
+            /* Status Colors */
+            --success: #00ff9d;
+            --warning: #ffcc00;
+            --error: #ff3d3d;
+            --info: #00f3ff;
+            
+            /* Layout */
+            --border-radius: 20px;
+            --border-radius-sm: 12px;
+            --border-radius-lg: 30px;
+            --spacing-xs: 8px;
+            --spacing-sm: 16px;
+            --spacing-md: 24px;
+            --spacing-lg: 32px;
+            --spacing-xl: 48px;
+            --spacing-xxl: 64px;
+            
+            /* Shadows */
+            --neumorphic-shadow: 10px 10px 20px var(--neumorphic-shadow-dark),
+                                 -10px -10px 20px var(--neumorphic-shadow-light);
+            --neumorphic-inset: inset 5px 5px 10px var(--neumorphic-inset-dark),
+                                inset -5px -5px 10px var(--neumorphic-inset-light);
+            --neumorphic-active: inset 3px 3px 6px var(--neumorphic-inset-dark),
+                                 inset -3px -3px 6px var(--neumorphic-inset-light);
+            --neumorphic-hover: 12px 12px 24px var(--neumorphic-shadow-dark),
+                                -12px -12px 24px var(--neumorphic-shadow-light);
+            
+            /* Animations */
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--neumorphic-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--neumorphic-bg-light);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+        }
+
+        /* Utility Classes */
+        .neon-text {
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% auto;
+            animation: gradient 3s linear infinite;
+        }
+
+        .neon-glow {
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+
+        .neon-border {
+            position: relative;
+            border-radius: var(--border-radius);
+        }
+
+        .neon-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink), var(--neon-cyan));
+            border-radius: calc(var(--border-radius) + 2px);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity var(--transition-normal);
+            background-size: 400% 400%;
+            animation: gradient-border 3s ease infinite;
+        }
+
+        .neon-border:hover::before {
+            opacity: 0.8;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes gradient-border {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            border-radius: var(--border-radius-lg);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-shadow);
+            position: relative;
+            animation: slideIn 0.8s ease;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .logo-icon {
+            font-size: 3rem;
+            color: var(--neon-cyan);
+            filter: drop-shadow(0 0 15px var(--neon-cyan));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-main {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+
+        .logo-sub {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            margin-top: 4px;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+            animation: slideIn 1s ease;
+        }
+
+        .stat-card {
+            flex: 1;
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--neumorphic-hover);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: var(--spacing-sm);
+            color: var(--neon-cyan);
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Main Content Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dashboard Panel */
+        .dashboard-panel {
+            border-radius: var(--border-radius-lg);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-shadow);
+            padding: var(--spacing-lg);
+            animation: slideIn 1.2s ease;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .panel-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .panel-title i {
+            color: var(--neon-cyan);
+        }
+
+        /* Wallet Connect Button */
+        #connectWallet {
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+            border: none;
+            color: black;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            transition: all var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #connectWallet::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        #connectWallet:hover::before {
+            left: 100%;
+        }
+
+        #connectWallet:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 243, 255, 0.3);
+        }
+
+        #connectWallet.connected {
+            background: var(--neumorphic-active-bg);
+            color: var(--success);
+            box-shadow: var(--neumorphic-inset);
+        }
+
+        /* Balance Cards */
+        .balance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .balance-card {
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-inset);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            transition: all var(--transition-normal);
+        }
+
+        .balance-card:hover {
+            box-shadow: var(--neumorphic-active);
+            transform: translateX(5px);
+        }
+
+        .balance-icon-container {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .balance-info {
+            flex: 1;
+        }
+
+        .balance-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .balance-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .balance-change {
+            font-size: 0.8rem;
+            color: var(--success);
+        }
+
+        /* Purchase Panel */
+        .purchase-panel {
+            border-radius: var(--border-radius-lg);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-shadow);
+            padding: var(--spacing-lg);
+            animation: slideIn 1.4s ease;
+        }
+
+        .purchase-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .purchase-option {
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-shadow);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .purchase-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 30%, rgba(0, 243, 255, 0.1) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .purchase-option:hover::before {
+            transform: translateX(100%);
+        }
+
+        .purchase-option:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--neumorphic-hover);
+            border-color: var(--neon-cyan);
+        }
+
+        .purchase-option.selected {
+            background: var(--neumorphic-active-bg);
+            box-shadow: var(--neumorphic-inset);
+            border-color: var(--neon-purple);
+        }
+
+        .purchase-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--neon-pink);
+            color: black;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 12px;
+            transform: rotate(15deg);
+        }
+
+        .purchase-sol {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            margin-bottom: 8px;
+        }
+
+        .purchase-xyz {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .purchase-bonus {
+            font-size: 0.8rem;
+            color: var(--neon-green);
+            background: rgba(0, 255, 157, 0.1);
+            padding: 4px 8px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        /* Custom Purchase */
+        .custom-purchase {
+            background: var(--neumorphic-bg-light);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--neumorphic-inset);
+        }
+
+        .custom-input-group {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .custom-input-group input {
+            flex: 1;
+            background: var(--neumorphic-bg);
+            border: none;
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-family: 'Orbitron', sans-serif;
+            box-shadow: var(--neumorphic-inset);
+            transition: all var(--transition-normal);
+        }
+
+        .custom-input-group input:focus {
+            outline: none;
+            box-shadow: var(--neumorphic-active);
+            border: 1px solid var(--neon-cyan);
+        }
+
+        .currency-label {
+            min-width: 80px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--neon-cyan);
+        }
+
+        .conversion-display {
+            text-align: center;
+            padding: var(--spacing-sm);
+            background: rgba(0, 243, 255, 0.05);
+            border-radius: var(--border-radius-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .conversion-rate {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+        }
+
+        .action-button {
+            padding: var(--spacing-md);
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            transition: all var(--transition-normal);
+        }
+
+        #confirmPurchase {
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+            color: white;
+        }
+
+        #confirmPurchase:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(157, 0, 255, 0.3);
+        }
+
+        #refreshBalances {
+            background: var(--neumorphic-bg-light);
+            color: var(--text-primary);
+            box-shadow: var(--neumorphic-shadow);
+        }
+
+        #refreshBalances:hover {
+            box-shadow: var(--neumorphic-active);
+        }
+
+        .action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Side Panel */
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+
+        /* Info Panel */
+        .info-panel {
+            border-radius: var(--border-radius-lg);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-shadow);
+            padding: var(--spacing-lg);
+            animation: slideIn 1.6s ease;
+        }
+
+        .info-section {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .info-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-section h3 {
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-list li:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-top: var(--spacing-md);
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-xs);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: var(--neumorphic-bg-light);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: var(--neumorphic-inset);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+            border-radius: 6px;
+            width: 45%;
+            transition: width 1s ease;
+        }
+
+        /* Transaction History */
+        .transaction-history {
+            border-radius: var(--border-radius-lg);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-shadow);
+            padding: var(--spacing-lg);
+            animation: slideIn 1.8s ease;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .history-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .history-button {
+            background: var(--neumorphic-bg-light);
+            border: none;
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all var(--transition-fast);
+        }
+
+        .history-button:hover {
+            background: var(--neumorphic-active-bg);
+        }
+
+        #transactionList {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: var(--spacing-sm);
+        }
+
+        .transaction-item {
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            border-radius: var(--border-radius);
+            background: var(--neumorphic-bg-light);
+            box-shadow: var(--neumorphic-inset);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--transition-fast);
+            animation: slideIn 0.5s ease;
+        }
+
+        .transaction-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--neumorphic-active);
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-type {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .transaction-amount {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+        }
+
+        .transaction-details {
+            text-align: right;
+        }
+
+        .transaction-date {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            margin-bottom: 4px;
+        }
+
+        .transaction-status {
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: rgba(255, 204, 0, 0.1);
+            color: var(--warning);
+        }
+
+        .status-failed {
+            background: rgba(255, 61, 61, 0.1);
+            color: var(--error);
+        }
+
+        /* Wallet Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--neumorphic-bg);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--neumorphic-shadow);
+            border: 1px solid var(--neumorphic-inset-light);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            color: var(--neon-cyan);
+        }
+
+        .wallet-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .wallet-option {
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius);
+            background: var(--neumorphic-bg);
+            box-shadow: var(--neumorphic-shadow);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            border: 2px solid transparent;
+        }
+
+        .wallet-option:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--neumorphic-hover);
+            border-color: var(--neon-cyan);
+        }
+
+        .wallet-icon {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-md);
+            color: var(--neon-cyan);
+        }
+
+        .wallet-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .wallet-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Loading Modal */
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--neumorphic-shadow-dark);
+            border-top: 4px solid var(--neon-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--spacing-lg);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: var(--spacing-xl);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: var(--spacing-xl);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        .footer-links a:hover {
+            color: var(--neon-cyan);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-bar {
+                flex-wrap: wrap;
+            }
+            
+            .stat-card {
+                min-width: calc(50% - var(--spacing-md));
+            }
+            
+            .purchase-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: var(--spacing-md);
+                text-align: center;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+            }
+            
+            .stat-card {
+                min-width: 100%;
+            }
+            
+            .purchase-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .wallet-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="neon-border">
+            <div class="logo-container">
+                <i class="fas fa-cube logo-icon"></i>
+                <div class="logo-text">
+                    <div class="logo-main neon-text">XYZ INNOVAGENCE</div>
+                    <div class="logo-sub">SOLANA PRESALE PLATFORM</div>
+                </div>
+            </div>
+            <button id="connectWallet" class="neon-border">
+                <i class="fas fa-wallet"></i>
+                <span>Connect Wallet</span>
+            </button>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <i class="fas fa-fire stat-icon"></i>
+                <div class="stat-value" id="totalRaised">0 SOL</div>
+                <div class="stat-label">Total Raised</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-users stat-icon"></i>
+                <div class="stat-value" id="totalInvestors">0</div>
+                <div class="stat-label">Total Investors</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-bolt stat-icon"></i>
+                <div class="stat-value" id="remainingTokens">2.5M</div>
+                <div class="stat-label">Tokens Remaining</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-chart-line stat-icon"></i>
+                <div class="stat-value" id="currentPrice">$0.00888</div>
+                <div class="stat-label">Token Price</div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+            <!-- Left Column -->
+            <div class="left-column">
+                <!-- Dashboard Panel -->
+                <div class="dashboard-panel neon-border">
+                    <div class="panel-header">
+                        <h2 class="panel-title"><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+                        <button id="connectWallet2" class="neon-border">
+                            <i class="fas fa-wallet"></i>
+                            <span>Connect Wallet</span>
+                        </button>
+                    </div>
+                    
+                    <div id="loginPrompt" style="text-align: center; padding: var(--spacing-xl);">
+                        <i class="fas fa-wallet" style="font-size: 4rem; color: var(--text-secondary); margin-bottom: var(--spacing-md);"></i>
+                        <h3 style="margin-bottom: var(--spacing-sm); color: var(--text-primary);">Connect Your Wallet</h3>
+                        <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">Connect your Solana wallet to participate in the XYZ INNOVAGENCE presale and access your dashboard</p>
+                    </div>
+
+                    <div id="userDashboard" style="display: none;">
+                        <!-- Balance Cards -->
+                        <div class="balance-grid">
+                            <div class="balance-card">
+                                <div class="balance-icon-container">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <div class="balance-info">
+                                    <div class="balance-label">SOL Balance</div>
+                                    <div id="solBalance" class="balance-amount">0.00</div>
+                                    <div id="solUsd" class="balance-change">$0.00</div>
+                                </div>
+                            </div>
+                            <div class="balance-card">
+                                <div class="balance-icon-container">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <div class="balance-info">
+                                    <div class="balance-label">XYZ Balance</div>
+                                    <div id="xyzBalance" class="balance-amount">0</div>
+                                    <div class="balance-change">Presale Tokens</div>
+                                </div>
+                            </div>
+                            <div class="balance-card">
+                                <div class="balance-icon-container">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="balance-info">
+                                    <div class="balance-label">Total Investment</div>
+                                    <div id="totalInvestment" class="balance-amount">0 SOL</div>
+                                    <div class="balance-change">All Time</div>
+                                </div>
+                            </div>
+                            <div class="balance-card">
+                                <div class="balance-icon-container">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div class="balance-info">
+                                    <div class="balance-label">Your Rank</div>
+                                    <div id="userRank" class="balance-amount">#--</div>
+                                    <div class="balance-change">Top Investor</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wallet Info -->
+                        <div style="background: var(--neumorphic-bg-light); padding: var(--spacing-md); border-radius: var(--border-radius); margin-bottom: var(--spacing-lg);">
+                            <div class="balance-label" style="margin-bottom: var(--spacing-xs);">Connected Wallet</div>
+                            <div id="walletAddress" style="font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--neon-cyan); word-break: break-all;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchase Panel -->
+                <div class="purchase-panel neon-border">
+                    <h2 class="panel-title"><i class="fas fa-rocket"></i> Purchase XYZ Tokens</h2>
+                    
+                    <div class="purchase-options">
+                        <div class="purchase-option" data-sol="1" data-xyz="112">
+                            <div class="purchase-badge">POPULAR</div>
+                            <div class="purchase-sol">1 SOL</div>
+                            <div class="purchase-xyz">112 XYZ</div>
+                            <div class="purchase-bonus">+5% Bonus</div>
+                        </div>
+                        <div class="purchase-option" data-sol="5" data-xyz="563">
+                            <div class="purchase-badge">BEST VALUE</div>
+                            <div class="purchase-sol">5 SOL</div>
+                            <div class="purchase-xyz">563 XYZ</div>
+                            <div class="purchase-bonus">+10% Bonus</div>
+                        </div>
+                        <div class="purchase-option" data-sol="10" data-xyz="1126">
+                            <div class="purchase-badge">WHALE</div>
+                            <div class="purchase-sol">10 SOL</div>
+                            <div class="purchase-xyz">1,126 XYZ</div>
+                            <div class="purchase-bonus">+15% Bonus</div>
+                        </div>
+                    </div>
+
+                    <div class="custom-purchase">
+                        <h3 style="margin-bottom: var(--spacing-md); color: var(--text-primary);">Custom Amount</h3>
+                        <div class="custom-input-group">
+                            <input type="number" id="customSol" placeholder="Enter SOL amount" min="0.1" step="0.1">
+                            <div class="currency-label">SOL</div>
+                        </div>
+                        <div class="conversion-display">
+                            <div style="font-size: 1.2rem; font-weight: 600; color: var(--neon-cyan);">
+                                You receive: <span id="customXyz">0</span> XYZ
+                            </div>
+                            <div class="conversion-rate">Rate: 1 SOL = 112 XYZ ($0.00888 per XYZ)</div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="confirmPurchase" class="action-button" disabled>
+                            <i class="fas fa-check-circle"></i>
+                            <span>Confirm Purchase</span>
+                        </button>
+                        <button id="refreshBalances" class="action-button">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Refresh</span>
+                        </button>
+                    </div>
+
+                    <div style="margin-top: var(--spacing-md); padding: var(--spacing-sm); background: rgba(255, 61, 61, 0.05); border-radius: var(--border-radius-sm); border: 1px solid var(--error);">
+                        <div style="font-size: 0.9rem; color: var(--text-secondary); text-align: center;">
+                            <i class="fas fa-exclamation-triangle" style="color: var(--error); margin-right: 8px;"></i>
+                            Funds will be sent to: <span style="color: var(--neon-cyan); font-family: 'Orbitron', sans-serif;">ARN3gpCaGvySyE6hnK3KsNco6VCNZbBNLqMosPgjrvjy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="side-panel">
+                <!-- Info Panel -->
+                <div class="info-panel neon-border">
+                    <h2 class="panel-title"><i class="fas fa-info-circle"></i> Presale Information</h2>
+                    
+                    <div class="info-section">
+                        <h3><i class="fas fa-chart-line"></i> Tokenomics</h3>
+                        <ul class="info-list">
+                            <li>
+                                <span class="info-label">Total Supply</span>
+                                <span class="info-value">10,000,000 XYZ</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Presale Allocation</span>
+                                <span class="info-value">5,000,000 XYZ</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Presale Price</span>
+                                <span class="info-value">$0.00888</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Listing Price</span>
+                                <span class="info-value">$0.02</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="info-section">
+                        <h3><i class="fas fa-calendar-alt"></i> Timeline</h3>
+                        <ul class="info-list">
+                            <li>
+                                <span class="info-label">Presale Start</span>
+                                <span class="info-value">Dec 1, 2023</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Presale End</span>
+                                <span class="info-value">Jan 31, 2024</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Token Distribution</span>
+                                <span class="info-value">Feb 15, 2024</span>
+                            </li>
+                            <li>
+                                <span class="info-label">Exchange Listing</span>
+                                <span class="info-value">Mar 1, 2024</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-label">
+                            <span>Presale Progress</span>
+                            <span id="progressPercent">45%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="info-panel neon-border">
+                    <h2 class="panel-title"><i class="fas fa-bolt"></i> Recent Activity</h2>
+                    <div id="recentActivity" style="min-height: 200px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
+                        <div style="text-align: center;">
+                            <i class="fas fa-exchange-alt" style="font-size: 3rem; margin-bottom: var(--spacing-sm);"></i>
+                            <p>No recent activity</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction History -->
+        <div class="transaction-history neon-border">
+            <div class="history-header">
+                <h2 class="panel-title"><i class="fas fa-history"></i> Your Transactions</h2>
+                <div class="history-actions">
+                    <button class="history-button" id="exportHistory">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="history-button" id="clearHistory">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+            </div>
+            <div id="transactionList">
+                <div style="text-align: center; padding: var(--spacing-xl); color: var(--text-secondary);">
+                    <i class="fas fa-exchange-alt" style="font-size: 3rem; margin-bottom: var(--spacing-sm);"></i>
+                    <p>No transactions yet. Connect your wallet and make a purchase to see your history.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-links">
+                <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="#"><i class="fab fa-telegram"></i> Telegram</a>
+                <a href="#"><i class="fab fa-discord"></i> Discord</a>
+                <a href="#"><i class="fas fa-file-contract"></i> Whitepaper</a>
+                <a href="#"><i class="fas fa-question-circle"></i> FAQ</a>
+            </div>
+            <p>XYZ INNOVAGENCE Presale Platform v2.0 | Powered by Solana & Firebase | Secure & Transparent</p>
+            <p style="margin-top: var(--spacing-sm); font-size: 0.8rem; color: var(--text-tertiary);">
+                Always verify transaction details. This interface is for demonstration purposes.
+            </p>
+        </footer>
+    </div>
+
+    <!-- Wallet Modal -->
+    <div id="walletModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <h2 style="font-size: 2rem; margin-bottom: var(--spacing-sm);" class="neon-text">Connect Wallet</h2>
+            <p style="color: var(--text-secondary); margin-bottom: var(--spacing-lg);">
+                Select your preferred Solana wallet to connect to XYZ INNOVAGENCE Presale
+            </p>
+            
+            <div class="wallet-grid">
+                <div class="wallet-option" id="phantomWallet">
+                    <i class="fab fa-phantom wallet-icon"></i>
+                    <div class="wallet-name">Phantom</div>
+                    <div class="wallet-desc">Most Popular</div>
+                </div>
+                <div class="wallet-option" id="solflareWallet">
+                    <i class="fas fa-fire wallet-icon"></i>
+                    <div class="wallet-name">Solflare</div>
+                    <div class="wallet-desc">Web & Mobile</div>
+                </div>
+                <div class="wallet-option" id="backpackWallet">
+                    <i class="fas fa-suitcase wallet-icon"></i>
+                    <div class="wallet-name">Backpack</div>
+                    <div class="wallet-desc">Developer Friendly</div>
+                </div>
+                <div class="wallet-option" id="glowWallet">
+                    <i class="fas fa-gem wallet-icon"></i>
+                    <div class="wallet-name">Glow</div>
+                    <div class="wallet-desc">iOS Focused</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: var(--spacing-lg); padding: var(--spacing-md); background: rgba(0, 243, 255, 0.05); border-radius: var(--border-radius);">
+                <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                    <i class="fas fa-shield-alt" style="color: var(--neon-cyan); margin-right: 8px;"></i>
+                    Your wallet connection is secure. We never access your private keys.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div id="loadingModal" class="modal">
+        <div class="modal-content">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <h2 class="neon-text" id="loadingTitle">Processing</h2>
+                <p id="loadingMessage" style="color: var(--text-secondary); margin-top: var(--spacing-sm);">
+                    Please wait while we process your request...
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px;"></div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfmTStSffKTDb8pPQrgBbNADK8jQq6s38",
+            authDomain: "arbify-ce847.firebaseapp.com",
+            databaseURL: "https://arbify-ce847-default-rtdb.firebaseio.com",
+            projectId: "arbify-ce847",
+            storageBucket: "arbify-ce847.firebasestorage.app",
+            messagingSenderId: "917500508857",
+            appId: "1:917500508857:web:290a8b2de00934b8cfb968",
+            measurementId: "G-8M416W4MY2"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Solana Configuration
+        const solanaWeb3 = window.solanaWeb3;
+        const HELIUS_RPC = 'https://mainnet.helius-rpc.com/?api-key=944a3332-20cf-47be-9390-6ca28d0e3999';
+        const connection = new solanaWeb3.Connection(HELIUS_RPC, 'confirmed');
+        
+        // Presale Configuration
+        const PRESALE_WALLET = new solanaWeb3.PublicKey('ARN3gpCaGvySyE6hnK3KsNco6VCNZbBNLqMosPgjrvjy');
+        const TOKEN_PRICE = 0.00888;
+        const TOKENS_PER_SOL = 112;
+        
+        // App State
+        let wallet = null;
+        let userPublicKey = null;
+        let selectedPurchaseOption = null;
+        let solPriceUsd = 100;
+        let userData = null;
+        let recentTransactions = [];
+        let presaleStats = {
+            totalRaised: 0,
+            totalInvestors: 0,
+            remainingTokens: 2500000
+        };
+
+        // DOM Elements
+        const connectWalletBtn = document.getElementById('connectWallet');
+        const connectWalletBtn2 = document.getElementById('connectWallet2');
+        const walletModal = document.getElementById('walletModal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const loadingModal = document.getElementById('loadingModal');
+        const confirmPurchaseBtn = document.getElementById('confirmPurchase');
+        const refreshBalancesBtn = document.getElementById('refreshBalances');
+        const customSolInput = document.getElementById('customSol');
+        const customXyzDisplay = document.getElementById('customXyz');
+        const solBalanceDisplay = document.getElementById('solBalance');
+        const solUsdDisplay = document.getElementById('solUsd');
+        const xyzBalanceDisplay = document.getElementById('xyzBalance');
+        const totalInvestmentDisplay = document.getElementById('totalInvestment');
+        const userRankDisplay = document.getElementById('userRank');
+        const walletAddressDisplay = document.getElementById('walletAddress');
+        const userDashboard = document.getElementById('userDashboard');
+        const loginPromptDiv = document.getElementById('loginPrompt');
+        const transactionList = document.getElementById('transactionList');
+        const recentActivityDiv = document.getElementById('recentActivity');
+        const purchaseOptions = document.querySelectorAll('.purchase-option');
+        const exportHistoryBtn = document.getElementById('exportHistory');
+        const clearHistoryBtn = document.getElementById('clearHistory');
+        
+        // Stats Elements
+        const totalRaisedDisplay = document.getElementById('totalRaised');
+        const totalInvestorsDisplay = document.getElementById('totalInvestors');
+        const remainingTokensDisplay = document.getElementById('remainingTokens');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercent = document.getElementById('progressPercent');
+
+        // Initialize Particles.js Background
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: ["#00f3ff", "#9d00ff", "#ff00cc"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#00f3ff",
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', async () => {
+            setupEventListeners();
+            checkSavedWallet();
+            await initializePresaleStats();
+            await fetchSolPrice();
+            
+            // Initialize purchase options
+            purchaseOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    purchaseOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    selectedPurchaseOption = {
+                        sol: parseFloat(option.dataset.sol),
+                        xyz: parseInt(option.dataset.xyz)
+                    };
+                    customSolInput.value = '';
+                    updateConfirmButton();
+                });
+            });
+
+            // Load global recent activity
+            await loadRecentActivity();
+        });
+
+        // Event Listeners
+        function setupEventListeners() {
+            // Wallet connection
+            connectWalletBtn.addEventListener('click', showWalletModal);
+            connectWalletBtn2.addEventListener('click', showWalletModal);
+            
+            // Wallet options
+            document.getElementById('phantomWallet').addEventListener('click', () => connectWallet('phantom'));
+            document.getElementById('solflareWallet').addEventListener('click', () => connectWallet('solflare'));
+            document.getElementById('backpackWallet').addEventListener('click', () => connectWallet('backpack'));
+            document.getElementById('glowWallet').addEventListener('click', () => connectWallet('glow'));
+            
+            // Modal controls
+            closeModalBtn.addEventListener('click', () => {
+                walletModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target === walletModal) {
+                    walletModal.style.display = 'none';
+                }
+            });
+
+            // Purchase controls
+            customSolInput.addEventListener('input', handleCustomAmount);
+            confirmPurchaseBtn.addEventListener('click', handlePurchase);
+            refreshBalancesBtn.addEventListener('click', () => {
+                if (userPublicKey) {
+                    fetchBalances();
+                    showNotification('Balances refreshed!', 'success');
+                }
+            });
+
+            // History controls
+            exportHistoryBtn.addEventListener('click', exportTransactionHistory);
+            clearHistoryBtn.addEventListener('click', clearTransactionHistory);
+        }
+
+        // Show wallet modal
+        function showWalletModal() {
+            walletModal.style.display = 'flex';
+        }
+
+        // Handle custom amount input
+        function handleCustomAmount() {
+            const solAmount = parseFloat(customSolInput.value) || 0;
+            const xyzAmount = Math.floor(solAmount / TOKEN_PRICE);
+            customXyzDisplay.textContent = xyzAmount.toLocaleString();
+            
+            // Deselect preset options
+            purchaseOptions.forEach(opt => opt.classList.remove('selected'));
+            selectedPurchaseOption = null;
+            
+            updateConfirmButton();
+        }
+
+        // Update confirm button state
+        function updateConfirmButton() {
+            const hasSelection = selectedPurchaseOption || (customSolInput.value && parseFloat(customSolInput.value) > 0);
+            confirmPurchaseBtn.disabled = !hasSelection || !userPublicKey;
+        }
+
+        // Connect wallet function
+        async function connectWallet(walletType) {
+            try {
+                showLoading('Connecting wallet...');
+                
+                let walletProvider;
+                switch(walletType) {
+                    case 'phantom':
+                        if (window.solana && window.solana.isPhantom) {
+                            walletProvider = window.solana;
+                        } else {
+                            window.open('https://phantom.app/', '_blank');
+                            throw new Error('Phantom wallet not found. Please install it first.');
+                        }
+                        break;
+                        
+                    case 'solflare':
+                        if (window.solflare) {
+                            walletProvider = window.solflare;
+                        } else if (window.solana && window.solana.isSolflare) {
+                            walletProvider = window.solana;
+                        } else {
+                            window.open('https://solflare.com/', '_blank');
+                            throw new Error('Solflare wallet not found. Please install it first.');
+                        }
+                        break;
+                        
+                    case 'backpack':
+                        if (window.backpack) {
+                            walletProvider = window.backpack;
+                        } else {
+                            window.open('https://www.backpack.app/', '_blank');
+                            throw new Error('Backpack wallet not found. Please install it first.');
+                        }
+                        break;
+                        
+                    case 'glow':
+                        if (window.glow) {
+                            walletProvider = window.glow;
+                        } else {
+                            window.open('https://glow.app/', '_blank');
+                            throw new Error('Glow wallet not found. Please install it first.');
+                        }
+                        break;
+                        
+                    default:
+                        throw new Error('Unsupported wallet type');
+                }
+
+                // Request connection
+                const response = await walletProvider.connect();
+                userPublicKey = new solanaWeb3.PublicKey(response.publicKey.toString());
+                wallet = walletProvider;
+                
+                // Save to localStorage
+                localStorage.setItem('xyz_connected_wallet', userPublicKey.toString());
+                localStorage.setItem('xyz_wallet_type', walletType);
+                
+                // Update UI
+                updateUIAfterConnection();
+                
+                // Close modal
+                walletModal.style.display = 'none';
+                
+                showNotification(`${walletType.charAt(0).toUpperCase() + walletType.slice(1)} wallet connected successfully!`, 'success');
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                showNotification(error.message, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Check for saved wallet connection
+        function checkSavedWallet() {
+            const savedWallet = localStorage.getItem('xyz_connected_wallet');
+            const savedWalletType = localStorage.getItem('xyz_wallet_type');
+            
+            if (savedWallet) {
+                userPublicKey = new solanaWeb3.PublicKey(savedWallet);
+                
+                // Try to reconnect with saved wallet type
+                if (savedWalletType && window[savedWalletType]) {
+                    wallet = window[savedWalletType];
+                }
+                
+                updateUIAfterConnection();
+            }
+        }
+
+        // Update UI after wallet connection
+        async function updateUIAfterConnection() {
+            if (!userPublicKey) return;
+
+            // Show user dashboard, hide login prompt
+            userDashboard.style.display = 'block';
+            loginPromptDiv.style.display = 'none';
+            
+            // Update wallet address display
+            const shortAddress = `${userPublicKey.toString().slice(0, 8)}...${userPublicKey.toString().slice(-8)}`;
+            walletAddressDisplay.textContent = shortAddress;
+            
+            // Update connect buttons
+            const connectedText = `<i class="fas fa-check-circle"></i><span>Connected</span>`;
+            connectWalletBtn.innerHTML = connectedText;
+            connectWalletBtn2.innerHTML = connectedText;
+            connectWalletBtn.classList.add('connected');
+            connectWalletBtn2.classList.add('connected');
+            
+            // Fetch and update data
+            await fetchBalances();
+            await loadTransactionHistory();
+            await createOrUpdateUser();
+            await updatePresaleStats();
+            
+            // Enable purchase button if amount is selected
+            updateConfirmButton();
+        }
+
+        // Initialize presale stats
+        async function initializePresaleStats() {
+            try {
+                const statsDoc = await db.collection('presale').doc('stats').get();
+                if (statsDoc.exists) {
+                    presaleStats = { ...presaleStats, ...statsDoc.data() };
+                }
+                updateStatsDisplay();
+            } catch (error) {
+                console.error('Error loading presale stats:', error);
+            }
+        }
+
+        // Update presale stats display
+        function updateStatsDisplay() {
+            totalRaisedDisplay.textContent = `${presaleStats.totalRaised.toLocaleString()} SOL`;
+            totalInvestorsDisplay.textContent = presaleStats.totalInvestors.toLocaleString();
+            remainingTokensDisplay.textContent = `${(presaleStats.remainingTokens / 1000000).toFixed(1)}M`;
+            
+            const progress = ((2500000 - presaleStats.remainingTokens) / 2500000) * 100;
+            progressFill.style.width = `${progress}%`;
+            progressPercent.textContent = `${progress.toFixed(1)}%`;
+        }
+
+        // Update presale stats in Firebase
+        async function updatePresaleStats() {
+            try {
+                await db.collection('presale').doc('stats').set(presaleStats, { merge: true });
+            } catch (error) {
+                console.error('Error updating presale stats:', error);
+            }
+        }
+
+        // Fetch SOL price
+        async function fetchSolPrice() {
+            try {
+                // Mock price for demo - in production, fetch from API
+                solPriceUsd = 100;
+            } catch (error) {
+                console.error('Error fetching SOL price:', error);
+            }
+        }
+
+        // Fetch user balances
+        async function fetchBalances() {
+            if (!userPublicKey) return;
+
+            try {
+                showLoading('Fetching balances...');
+                
+                // Fetch SOL balance
+                const solBalance = await connection.getBalance(userPublicKey);
+                const solInSol = solBalance / 1e9;
+                solBalanceDisplay.textContent = solInSol.toFixed(4);
+                solUsdDisplay.textContent = `$${(solInSol * solPriceUsd).toFixed(2)}`;
+
+                // Fetch user data from Firebase
+                const userDoc = await db.collection('users').doc(userPublicKey.toString()).get();
+                if (userDoc.exists) {
+                    userData = userDoc.data();
+                    xyzBalanceDisplay.textContent = (userData.xyzBalance || 0).toLocaleString();
+                    totalInvestmentDisplay.textContent = `${(userData.totalContributed || 0).toFixed(2)} SOL`;
+                    
+                    // Calculate rank (mock for demo)
+                    const rank = Math.floor(Math.random() * 100) + 1;
+                    userRankDisplay.textContent = `#${rank}`;
+                }
+            } catch (error) {
+                console.error('Error fetching balances:', error);
+                showNotification('Failed to fetch balances', 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Create or update user in Firebase
+        async function createOrUpdateUser() {
+            if (!userPublicKey) return;
+
+            try {
+                const userRef = db.collection('users').doc(userPublicKey.toString());
+                const userDoc = await userRef.get();
+                
+                if (userDoc.exists) {
+                    // Update last login
+                    await userRef.update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                        walletType: localStorage.getItem('xyz_wallet_type') || 'unknown'
+                    });
+                    userData = userDoc.data();
+                } else {
+                    // Create new user
+                    const newUser = {
+                        walletAddress: userPublicKey.toString(),
+                        xyzBalance: 0,
+                        totalContributed: 0,
+                        transactions: [],
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                        walletType: localStorage.getItem('xyz_wallet_type') || 'unknown'
+                    };
+                    
+                    await userRef.set(newUser);
+                    userData = newUser;
+                    
+                    // Update total investors
+                    presaleStats.totalInvestors++;
+                    await updatePresaleStats();
+                    updateStatsDisplay();
+                }
+            } catch (error) {
+                console.error('Error creating/updating user:', error);
+            }
+        }
+
+        // Handle purchase
+        async function handlePurchase() {
+            if (!userPublicKey || !wallet) {
+                showNotification('Please connect your wallet first', 'error');
+                return;
+            }
+
+            let solAmount, xyzAmount;
+            
+            if (selectedPurchaseOption) {
+                solAmount = selectedPurchaseOption.sol;
+                xyzAmount = selectedPurchaseOption.xyz;
+            } else {
+                solAmount = parseFloat(customSolInput.value);
+                xyzAmount = Math.floor(solAmount / TOKEN_PRICE);
+            }
+
+            if (solAmount <= 0 || isNaN(solAmount)) {
+                showNotification('Please enter a valid SOL amount', 'error');
+                return;
+            }
+
+            // Check if user has enough SOL
+            const solBalance = await connection.getBalance(userPublicKey);
+            if (solBalance < solAmount * 1e9) {
+                showNotification('Insufficient SOL balance', 'error');
+                return;
+            }
+
+            await processPurchase(solAmount, xyzAmount);
+        }
+
+        // Process purchase transaction
+        async function processPurchase(solAmount, xyzAmount) {
+            try {
+                showLoading('Preparing transaction...');
+                
+                // Create transaction
+                const transaction = new solanaWeb3.Transaction().add(
+                    solanaWeb3.SystemProgram.transfer({
+                        fromPubkey: userPublicKey,
+                        toPubkey: PRESALE_WALLET,
+                        lamports: solAmount * 1e9
+                    })
+                );
+
+                // Get recent blockhash
+                const { blockhash } = await connection.getRecentBlockhash();
+                transaction.recentBlockhash = blockhash;
+                transaction.feePayer = userPublicKey;
+
+                // Sign transaction
+                showLoading('Please approve the transaction in your wallet...');
+                const signed = await wallet.signTransaction(transaction);
+                
+                // Send transaction
+                showLoading('Sending transaction to the network...');
+                const signature = await connection.sendRawTransaction(signed.serialize());
+                
+                // Confirm transaction
+                showLoading('Confirming transaction...');
+                const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+                
+                if (confirmation.value.err) {
+                    throw new Error('Transaction failed');
+                }
+
+                // Save transaction
+                await saveTransaction(solAmount, xyzAmount, signature);
+                
+                // Update UI
+                await updateAfterPurchase(solAmount, xyzAmount, signature);
+                
+                // Reset form
+                purchaseOptions.forEach(opt => opt.classList.remove('selected'));
+                customSolInput.value = '';
+                selectedPurchaseOption = null;
+                updateConfirmButton();
+                
+                showNotification(`Successfully purchased ${xyzAmount.toLocaleString()} XYZ tokens!`, 'success');
+            } catch (error) {
+                console.error('Purchase error:', error);
+                showNotification('Purchase failed: ' + error.message, 'error');
+                
+                // Add failed transaction
+                addTransactionToUI(solAmount, xyzAmount, 'failed', 'failed');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Save transaction to Firebase
+        async function saveTransaction(solAmount, xyzAmount, signature) {
+            if (!userPublicKey) return;
+
+            try {
+                const transactionData = {
+                    solAmount,
+                    xyzAmount,
+                    signature,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'completed',
+                    walletAddress: userPublicKey.toString(),
+                    type: 'purchase'
+                };
+
+                // Update user document
+                const userRef = db.collection('users').doc(userPublicKey.toString());
+                await userRef.update({
+                    xyzBalance: firebase.firestore.FieldValue.increment(xyzAmount),
+                    totalContributed: firebase.firestore.FieldValue.increment(solAmount),
+                    transactions: firebase.firestore.FieldValue.arrayUnion(transactionData)
+                });
+
+                // Save to transactions collection
+                await db.collection('transactions').add(transactionData);
+                
+                // Update presale stats
+                presaleStats.totalRaised += solAmount;
+                presaleStats.remainingTokens -= xyzAmount;
+                await updatePresaleStats();
+                updateStatsDisplay();
+                
+                // Add to recent transactions
+                recentTransactions.unshift(transactionData);
+                if (recentTransactions.length > 10) recentTransactions = recentTransactions.slice(0, 10);
+                
+            } catch (error) {
+                console.error('Error saving transaction:', error);
+            }
+        }
+
+        // Update UI after purchase
+        async function updateAfterPurchase(solAmount, xyzAmount, signature) {
+            // Update balances
+            userData.xyzBalance = (userData.xyzBalance || 0) + xyzAmount;
+            userData.totalContributed = (userData.totalContributed || 0) + solAmount;
+            
+            xyzBalanceDisplay.textContent = userData.xyzBalance.toLocaleString();
+            totalInvestmentDisplay.textContent = `${userData.totalContributed.toFixed(2)} SOL`;
+            
+            // Update SOL balance
+            await fetchBalances();
+            
+            // Add transaction to history
+            addTransactionToUI(solAmount, xyzAmount, signature, 'completed');
+            
+            // Update recent activity
+            updateRecentActivity();
+        }
+
+        // Load transaction history
+        async function loadTransactionHistory() {
+            if (!userPublicKey) return;
+
+            try {
+                const transactionsRef = db.collection('transactions')
+                    .where('walletAddress', '==', userPublicKey.toString())
+                    .orderBy('timestamp', 'desc')
+                    .limit(20);
+
+                const snapshot = await transactionsRef.get();
+                
+                if (snapshot.empty) {
+                    return;
+                }
+
+                transactionList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const transaction = doc.data();
+                    addTransactionToUI(
+                        transaction.solAmount,
+                        transaction.xyzAmount,
+                        transaction.signature || 'local',
+                        transaction.status
+                    );
+                });
+            } catch (error) {
+                console.error('Error loading transaction history:', error);
+            }
+        }
+
+        // Add transaction to UI
+        function addTransactionToUI(solAmount, xyzAmount, signature, status) {
+            const transactionItem = document.createElement('div');
+            transactionItem.className = 'transaction-item';
+            
+            const date = new Date().toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            let statusClass = 'status-pending';
+            let statusText = 'Pending';
+            
+            if (status === 'completed') {
+                statusClass = 'status-success';
+                statusText = 'Completed';
+            } else if (status === 'failed') {
+                statusClass = 'status-failed';
+                statusText = 'Failed';
+            }
+            
+            const shortSignature = typeof signature === 'string' && signature.length > 20 
+                ? `${signature.slice(0, 10)}...${signature.slice(-8)}`
+                : signature;
+            
+            transactionItem.innerHTML = `
+                <div class="transaction-info">
+                    <div class="transaction-type">XYZ Token Purchase</div>
+                    <div class="transaction-amount">${solAmount} SOL → ${xyzAmount.toLocaleString()} XYZ</div>
+                </div>
+                <div class="transaction-details">
+                    <div class="transaction-date">${date}</div>
+                    <div class="transaction-status ${statusClass}">${statusText}</div>
+                    ${signature && signature !== 'local' ? `<div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 4px;">${shortSignature}</div>` : ''}
+                </div>
+            `;
+            
+            // Clear placeholder if exists
+            if (transactionList.children.length === 1 && 
+                transactionList.children[0].querySelector('.fa-exchange-alt')) {
+                transactionList.innerHTML = '';
+            }
+            
+            transactionList.prepend(transactionItem);
+        }
+
+        // Load recent activity
+        async function loadRecentActivity() {
+            try {
+                const activityRef = db.collection('transactions')
+                    .orderBy('timestamp', 'desc')
+                    .limit(5);
+
+                const snapshot = await activityRef.get();
+                
+                if (snapshot.empty) {
+                    return;
+                }
+
+                updateRecentActivity(snapshot);
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+            }
+        }
+
+        // Update recent activity display
+        function updateRecentActivity(snapshot = null) {
+            if (!snapshot) {
+                // Use local recent transactions
+                if (recentTransactions.length === 0) {
+                    return;
+                }
+                
+                recentActivityDiv.innerHTML = recentTransactions.map(transaction => `
+                    <div style="padding: var(--spacing-sm); border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: var(--neon-cyan);">${transaction.solAmount} SOL</span>
+                            <span style="color: var(--text-secondary); font-size: 0.8rem;">
+                                ${new Date(transaction.timestamp?.toDate?.() || new Date()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            </span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-tertiary);">
+                            → ${transaction.xyzAmount.toLocaleString()} XYZ
+                        </div>
+                    </div>
+                `).join('');
+                return;
+            }
+
+            recentActivityDiv.innerHTML = '';
+            snapshot.forEach(doc => {
+                const transaction = doc.data();
+                const activityItem = document.createElement('div');
+                activityItem.style.cssText = 'padding: var(--spacing-sm); border-bottom: 1px solid rgba(255,255,255,0.05);';
+                activityItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--neon-cyan);">${transaction.solAmount} SOL</span>
+                        <span style="color: var(--text-secondary); font-size: 0.8rem;">
+                            ${new Date(transaction.timestamp?.toDate?.() || new Date()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-tertiary);">
+                        → ${transaction.xyzAmount.toLocaleString()} XYZ
+                    </div>
+                `;
+                recentActivityDiv.appendChild(activityItem);
+            });
+        }
+
+        // Export transaction history
+        function exportTransactionHistory() {
+            if (!userPublicKey) {
+                showNotification('Please connect your wallet first', 'error');
+                return;
+            }
+
+            const transactions = Array.from(document.querySelectorAll('.transaction-item'));
+            if (transactions.length === 0) {
+                showNotification('No transactions to export', 'warning');
+                return;
+            }
+
+            const exportData = transactions.map(item => ({
+                type: item.querySelector('.transaction-type').textContent,
+                amount: item.querySelector('.transaction-amount').textContent,
+                date: item.querySelector('.transaction-date').textContent,
+                status: item.querySelector('.transaction-status').textContent
+            }));
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `xyz-transactions-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('Transaction history exported successfully!', 'success');
+        }
+
+        // Clear transaction history (local only)
+        function clearTransactionHistory() {
+            if (!confirm('Are you sure you want to clear your transaction history? This action cannot be undone.')) {
+                return;
+            }
+
+            transactionList.innerHTML = `
+                <div style="text-align: center; padding: var(--spacing-xl); color: var(--text-secondary);">
+                    <i class="fas fa-exchange-alt" style="font-size: 3rem; margin-bottom: var(--spacing-sm);"></i>
+                    <p>No transactions yet. Connect your wallet and make a purchase to see your history.</p>
+                </div>
+            `;
+            
+            showNotification('Transaction history cleared', 'success');
+        }
+
+        // Show loading modal
+        function showLoading(message = 'Processing...') {
+            document.getElementById('loadingMessage').textContent = message;
+            loadingModal.style.display = 'flex';
+        }
+
+        // Hide loading modal
+        function hideLoading() {
+            loadingModal.style.display = 'none';
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            
+            const icons = {
+                success: 'check-circle',
+                error: 'exclamation-circle',
+                warning: 'exclamation-triangle',
+                info: 'info-circle'
+            };
+            
+            const colors = {
+                success: 'var(--success)',
+                error: 'var(--error)',
+                warning: 'var(--warning)',
+                info: 'var(--info)'
+            };
+            
+            notification.innerHTML = `
+                <div style="
+                    background: var(--neumorphic-bg);
+                    padding: var(--spacing-sm) var(--spacing-md);
+                    border-radius: var(--border-radius);
+                    box-shadow: var(--neumorphic-shadow);
+                    border-left: 4px solid ${colors[type]};
+                    display: flex;
+                    align-items: center;
+                    gap: var(--spacing-sm);
+                    min-width: 300px;
+                    animation: slideIn 0.3s ease;
+                ">
+                    <i class="fas fa-${icons[type]}" style="color: ${colors[type]}; font-size: 1.2rem;"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 5000);
+        }
+
+        // Add slideOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
