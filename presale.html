@@ -2092,64 +2092,101 @@
         }
 
         // Export transaction history
-        function exportTransactionHistory() {
-            if (!userPublicKey) {
-                showNotification('Please connect your wallet first', 'error');
-                return;
-            }
+       /* ===============================
+   SAFE EXPORT TRANSACTION HISTORY
+================================= */
+function exportTransactionHistory() {
+    if (!userPublicKey) {
+        showNotification('Please connect your wallet first', 'error');
+        return;
+    }
 
-            const transactions = Array.from(document.querySelectorAll('.transaction-item'));
-            if (transactions.length === 0) {
-                showNotification('No transactions to export', 'warning');
-                return;
-            }
+    const items = document.querySelectorAll('.transaction-item');
+    if (!items.length) {
+        showNotification('No transactions to export', 'warning');
+        return;
+    }
 
-            const exportData = transactions.map(item => ({
-                type: item.querySelector('.transaction-type').textContent,
-                amount: item.querySelector('.transaction-amount').textContent,
-                date: item.querySelector('.transaction-date').textContent,
-                status: item.querySelector('.transaction-status').textContent
-            }));
+    const data = Array.from(items).map(item => ({
+        type: item.querySelector('.transaction-type')?.textContent || '',
+        amount: item.querySelector('.transaction-amount')?.textContent || '',
+        date: item.querySelector('.transaction-date')?.textContent || '',
+        status: item.querySelector('.transaction-status')?.textContent || ''
+    }));
 
-            const dataStr = JSON.stringify(exportData, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `xyz-transactions-${new Date().toISOString().split('T')[0]}.json`;
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-            
-            showNotification('Transaction history exported successfully!', 'success');
-        }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
 
-        // Clear transaction history (local only)
-        function clearTransactionHistory() {
-            if (!confirm('Are you sure you want to clear your transaction history? This action cannot be undone.')) {
-                return;
-            }
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'xyz-transactions.json';
+    a.click();
 
-            transactionList.innerHTML = `
-                <div style="text-align: center; padding: var(--spacing-xl); color: var(--text-secondary);">
-                    <i class="fas fa-exchange-alt" style="font-size: 3rem; margin-bottom: var(--spacing-sm);"></i>
-                    <p>No transactions yet. Connect your wallet and make a purchase to see your history.</p>
-                </div>
-            `;
-            
-            showNotification('Transaction history cleared', 'success');
-        }
+    URL.revokeObjectURL(url);
+    showNotification('Transaction history exported', 'success');
+}
 
-        // Show loading modal
-        function showLoading(message = 'Processing...') {
-            document.getElementById('loadingMessage').textContent = message;
-            loadingModal.style.display = 'flex';
-        }
+/* ===============================
+   CLEAR HISTORY (UI SAFE)
+================================= */
+function clearTransactionHistory() {
+    if (!userPublicKey) {
+        showNotification('Connect wallet first', 'error');
+        return;
+    }
 
-        // Hide loading modal
-        function hideLoading() {
-            loadingModal.style.display = 'none';
-        }
+    transactionList.innerHTML = `
+        <div style="text-align:center;padding:40px;color:var(--text-secondary)">
+            <i class="fas fa-exchange-alt" style="font-size:2rem"></i>
+            <p>No transactions</p>
+        </div>
+    `;
+
+    showNotification('Transaction history cleared (UI only)', 'info');
+}
+
+/* ===============================
+   SIMPLE NOTIFICATION SYSTEM
+================================= */
+function showNotification(message, type = 'info') {
+    const container = document.getElementById('notificationContainer');
+    const div = document.createElement('div');
+
+    const colors = {
+        success: '#00ff9d',
+        error: '#ff3d3d',
+        warning: '#ffcc00',
+        info: '#00f3ff'
+    };
+
+    div.style.cssText = `
+        background:#111;
+        border-left:4px solid ${colors[type]};
+        padding:12px 16px;
+        border-radius:8px;
+        color:white;
+        min-width:250px;
+        box-shadow:0 10px 30px rgba(0,0,0,.6);
+        animation:fadeIn .3s ease;
+    `;
+    div.textContent = message;
+
+    container.appendChild(div);
+    setTimeout(() => div.remove(), 4000);
+}
+
+/* ===============================
+   LOADING MODAL
+================================= */
+function showLoading(msg = 'Loading...') {
+    document.getElementById('loadingTitle').textContent = 'Please Wait';
+    document.getElementById('loadingMessage').textContent = msg;
+    document.getElementById('loadingModal').style.display = 'flex';
+}
+
+function hideLoading() {
+    document.getElementById('loadingModal').style.display = 'none';
+}
 
         // Show notification
         function showNotification(message, type = 'info') {
